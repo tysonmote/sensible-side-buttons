@@ -1,23 +1,23 @@
-Just some release and debugging stuff to jog my memory. -AB
+Release checklist (maintainer notes)
 
-Exporting app:
+Build:
+1. Bump CFBundleShortVersionString / CFBundleVersion in SideButtonFixer/Info.plist
+2. Xcode → Product → Archive (SensibleSideButtons scheme)
+3. Export Developer ID build; confirm: lipo -archs …/SensibleSideButtons
 
-1. archive
-2. "Export" -> "Developer ID"
+Notarize:
+1. ditto -c -k --keepParent SensibleSideButtons.app SensibleSideButtons.zip
+2. xcrun notarytool submit … --wait
+3. xcrun stapler staple SensibleSideButtons.app
 
-Creating DMG:
+DMG:
+1. Replace .app in existing DMG or create new folder image with Applications symlink
+2. hdiutil convert -format UDZO …
 
-1. convert previous .dmg with Disk Utility to read/write
-2. replace SensibleSideButtons.app with the new one
-3. re-convert the .dmg
+Defaults (debug):
+  defaults read net.archagon.sensible-side-buttons
+  defaults delete net.archagon.sensible-side-buttons
 
-Verifying certificate:
-
-1. codesign -dvvv SensibleSideButtons.app
-2. codesign --verify --deep --strict --verbose=2 SensibleSideButtons.app
-3. https://developer.apple.com/library/content/technotes/tn2206/_index.html
-
-Managing defaults:
-
-1. defaults read net.archagon.sensible-side-buttons
-2. defaults delete net.archagon.sensible-side-buttons
+Verify signing:
+  codesign -dvvv SensibleSideButtons.app
+  codesign --verify --deep --strict --verbose=2 SensibleSideButtons.app
