@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build SensibleSideButtons (unsigned)
+        run: |
+          xcodebuild -project SwipeSimulator.xcodeproj \
+            -scheme SensibleSideButtons \
+            -configuration Release \
+            -derivedDataPath DerivedData \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_ALLOWED=YES \
+            build
+
+      - name: Verify universal binary
+        run: |
+          BIN="DerivedData/Build/Products/Release/SensibleSideButtons.app/Contents/MacOS/SensibleSideButtons"
+          file "$BIN"
+          lipo -archs "$BIN"
